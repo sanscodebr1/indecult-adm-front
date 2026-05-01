@@ -1,0 +1,16 @@
+project_id = "indecult-adm-front"
+
+[functions.submit-profile-for-review]
+verify_jwt = true
+
+[functions.create-vote-challenge]
+verify_jwt = false
+
+[functions.cast-vote]
+verify_jwt = false
+
+[functions.admin-list-talents]
+verify_jwt = true
+
+[functions.admin-review-talent]
+verify_jwt = true

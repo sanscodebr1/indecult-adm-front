@@ -1,0 +1,26 @@
+{
+  "name": "@indecult/web",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@indecult/supabase": "*",
+    "@indecult/ui": "*",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.49.8",
+    "next": "^15.3.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@indecult/ui": [
+        "packages/ui/src"
+      ],
+      "@indecult/ui/*": [
+        "packages/ui/src/*"
+      ],
+      "@indecult/supabase": [
+        "packages/supabase/src"
+      ],
+      "@indecult/supabase/*": [
+        "packages/supabase/src/*"
+      ],
+      "@indecult/config/*": [
+        "packages/config/*"
+      ]
+    }
+  }
+}
