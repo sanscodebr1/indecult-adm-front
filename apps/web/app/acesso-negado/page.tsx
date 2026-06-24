@@ -7,9 +7,6 @@ export default function AccessDeniedPage() {
       <section className="auth-shell__panel">
         <header className="auth-shell__header">
           <BrandMark />
-          <Link href="/" className="text-link">
-            Voltar para a home <span aria-hidden="true">→</span>
-          </Link>
         </header>
 
         <section className="auth-layout">
