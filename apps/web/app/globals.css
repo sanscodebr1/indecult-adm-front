@@ -62,6 +62,13 @@ main {
   padding: 28px 16px 72px;
 }
 
+.auth-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
 .admin-page {
   width: min(1480px, 100%);
 }
@@ -481,6 +488,15 @@ main {
 .auth-layout {
   grid-template-columns: minmax(0, 0.95fr) minmax(320px, 0.75fr);
   gap: 18px;
+}
+
+.auth-layout:has(> :only-child) {
+  grid-template-columns: minmax(320px, 480px);
+  justify-content: center;
+}
+
+.auth-shell__header:has(> :only-child) {
+  justify-content: center;
 }
 
 .auth-copy {
@@ -903,6 +919,11 @@ main {
   .talent-card__meta,
   .talent-expanded-grid {
     grid-template-columns: 1fr;
+  }
+
+  .auth-layout:has(> :only-child) {
+    grid-template-columns: minmax(0, 480px);
+    justify-content: center;
   }
 
   .stat-grid {
