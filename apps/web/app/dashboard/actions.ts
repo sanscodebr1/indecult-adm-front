@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { Route } from "next";
 import { createServiceRoleSupabaseClient } from "@indecult/supabase/admin";
+import { reviewAdminTalent } from "@indecult/supabase";
+import { createServerSupabaseClient } from "@indecult/supabase/server";
 import { z } from "zod";
 import { requireAdminViewer } from "../../lib/admin";
 
@@ -97,116 +99,18 @@ export async function approveTalentProfileAction(formData: FormData) {
     redirect("/dashboard/talentos" as Route);
   }
 
-  const admin = await requireAdminViewer();
-  const serviceClient = createServiceRoleSupabaseClient();
-  const now = new Date().toISOString();
+  await requireAdminViewer();
+  const supabase = await createServerSupabaseClient();
   const profileId = parsed.data.profileId;
-
-  const changeRequestId = parsed.data.changeRequestId || null;
-  const changeRequest = changeRequestId
-    ? await serviceClient
-        .from("profile_change_requests")
-        .select("id, proposed_profile, proposed_media, request_type")
-        .eq("id", changeRequestId)
-        .maybeSingle()
-    : await serviceClient
-        .from("profile_change_requests")
-        .select("id, proposed_profile, proposed_media, request_type")
-        .eq("talent_profile_id", profileId)
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-  const requestRecord = changeRequest.data;
-  const proposedProfile = sanitizeApprovedProfilePayload(isRecord(requestRecord?.proposed_profile) ? requestRecord.proposed_profile : {});
-  const proposedMedia = Array.isArray(requestRecord?.proposed_media) ? requestRecord.proposed_media : [];
-
-  const normalizedMedia = proposedMedia
-    .filter(isRecord)
-    .map((item, index) => ({
-      talent_profile_id: profileId,
-      media_kind: toMediaKind(item.mediaKind),
-      source: toMediaSource(item.source),
-      storage_bucket: toNullableString(item.storageBucket),
-      storage_path: toNullableString(item.storagePath),
-      external_url: toNullableString(item.externalUrl),
-      mime_type: toNullableString(item.mimeType),
-      file_size_bytes: toNullableNumber(item.fileSizeBytes),
-      sort_order: typeof item.sortOrder === "number" ? item.sortOrder : index,
-      is_active: true
-    }))
-    .filter((item) => item.media_kind && item.source)
-    .map((item) => ({
-      talent_profile_id: item.talent_profile_id,
-      media_kind: item.media_kind as "gallery_image" | "intro_video" | "profile_photo",
-      source: item.source as "upload" | "youtube",
-      storage_bucket: item.storage_bucket,
-      storage_path: item.storage_path,
-      external_url: item.external_url,
-      mime_type: item.mime_type,
-      file_size_bytes: item.file_size_bytes,
-      sort_order: item.sort_order,
-      is_active: item.is_active
-    }));
-
-  const { error: profileError } = await serviceClient
-    .from("talent_profiles")
-    .update({
-      ...proposedProfile,
-      status: "approved",
-      reviewed_at: now,
-      reviewed_by: admin.id,
-      rejection_reason: null,
-      approved_change_request_id: requestRecord?.id ?? null
-    })
-    .eq("id", profileId);
-
-  if (profileError) {
-    throw new Error(profileError.message);
-  }
-
-  if (requestRecord?.id) {
-    const { error: requestError } = await serviceClient
-      .from("profile_change_requests")
-      .update({
-        status: "approved",
-        reviewed_at: now,
-        reviewed_by: admin.id,
-        rejection_reason: null,
-        review_notes: null,
-        applied_at: now
-      })
-      .eq("id", requestRecord.id);
-
-    if (requestError) {
-      throw new Error(requestError.message);
-    }
-  }
-
-  const { error: deleteMediaError } = await serviceClient.from("talent_profile_media").delete().eq("talent_profile_id", profileId);
-
-  if (deleteMediaError) {
-    throw new Error(deleteMediaError.message);
-  }
-
-  if (normalizedMedia.length > 0) {
-    const { error: mediaError } = await serviceClient.from("talent_profile_media").insert(normalizedMedia);
-
-    if (mediaError) {
-      throw new Error(mediaError.message);
-    }
-  }
-
-  await serviceClient.from("admin_audit_logs").insert({
-    actor_user_id: admin.id,
-    entity_type: "talent_profile",
-    entity_id: profileId,
-    action: "approve_profile",
-    metadata: {
-      request_id: requestRecord?.id ?? null
-    }
+  const result = await reviewAdminTalent(supabase, {
+    profileId,
+    changeRequestId: parsed.data.changeRequestId || null,
+    decision: "approved"
   });
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
 
   revalidatePath("/dashboard/talentos");
   revalidatePath(`/dashboard/talentos/${profileId}`);

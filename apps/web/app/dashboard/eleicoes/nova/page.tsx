@@ -13,7 +13,7 @@ export default function NewElectionPage() {
         <div className="stack">
           <p className="eyebrow">Operacao de eleicoes</p>
           <h1>Criar eleicao</h1>
-          <p className="muted-text">Cadastre uma campanha com agenda, visibilidade e limites operacionais diretamente no schema `elections`.</p>
+          <p className="muted-text">Cadastre uma campanha com agenda, visibilidade e limites operacionais.</p>
         </div>
 
         <Link href={"/dashboard/eleicoes" as Route} className="button button--secondary">

@@ -319,7 +319,7 @@ export default async function ElectionDetailPage({
               <h2>Organizacao interna</h2>
               {detail.categories.length === 0 ? (
                 <div className="inline-alert">
-                  Nenhuma categoria cadastrada ainda. O schema agora suporta categorias por eleicao e o vinculo direto delas com cada participante.
+                  Nenhuma categoria cadastrada ainda. Crie categorias para organizar os participantes desta eleicao.
                 </div>
               ) : (
                 <div className="history-list">
@@ -384,7 +384,7 @@ export default async function ElectionDetailPage({
             <article className="panel-card">
               <p className="eyebrow">Importacao</p>
               <h2>Adicionar aprovados por estado</h2>
-              <p className="muted-text">Escolha uma categoria e importe todos os talentos com status `approved` daquele estado.</p>
+              <p className="muted-text">Escolha uma categoria e importe todos os talentos aprovados daquele estado.</p>
 
               {detail.categories.length === 0 ? (
                 <div className="inline-alert">Crie ao menos uma categoria antes de importar participantes.</div>

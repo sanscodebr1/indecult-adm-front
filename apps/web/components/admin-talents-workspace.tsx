@@ -9,7 +9,9 @@ import {
   formatDateTime,
   formatFileSize,
   formatMediaKind,
-  formatProfileStatus
+  formatProfileStatus,
+  formatRegistrationPaymentStatus,
+  toRegistrationPaymentTone
 } from "../lib/admin-presenters";
 import { StatusBadge } from "./status-badge";
 
@@ -20,6 +22,7 @@ export function AdminTalentsWorkspace() {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
+  const [pendingApproval, setPendingApproval] = useState<AdminTalentListItem | null>(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -65,6 +68,15 @@ export function AdminTalentsWorkspace() {
     }
   }
 
+  function requestApproval(item: AdminTalentListItem) {
+    if (item.profile.registration_payment_status === "pending") {
+      setPendingApproval(item);
+      return;
+    }
+
+    reviewTalent(item, "approved");
+  }
+
   function reviewTalent(item: AdminTalentListItem, decision: "approved" | "rejected") {
     const reason = rejectionReasons[item.profile.id]?.trim() ?? "";
 
@@ -87,6 +99,7 @@ export function AdminTalentsWorkspace() {
         }
 
         setFeedback(result.data?.message ?? "Status atualizado com sucesso.");
+        setPendingApproval(null);
         await loadTalents();
         setExpandedId(item.profile.id);
       } catch (reviewError) {
@@ -101,7 +114,7 @@ export function AdminTalentsWorkspace() {
         <article className="panel-card">
           <p className="eyebrow">Fila atual</p>
           <p className="stat-highlight">{summary.pending}</p>
-          <p>Perfis em `pending_review` aguardando decisao.</p>
+          <p>Perfis aguardando analise.</p>
         </article>
         <article className="panel-card">
           <p className="eyebrow">Aprovados</p>
@@ -117,6 +130,38 @@ export function AdminTalentsWorkspace() {
 
       {feedback ? <div className="inline-alert inline-alert--success">{feedback}</div> : null}
       {error ? <div className="inline-alert inline-alert--danger">{error}</div> : null}
+
+      {pendingApproval ? (
+        <div className="admin-modal-backdrop" role="presentation" onClick={() => setPendingApproval(null)}>
+          <section
+            className="admin-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="approve-without-payment-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <p className="eyebrow">Confirmacao necessaria</p>
+            <h2 id="approve-without-payment-title">Aprovar talento sem pagamento?</h2>
+            <p className="muted-text">
+              <strong>{pendingApproval.profile.display_name}</strong> ainda nao concluiu o pagamento da inscricao. Voce pode
+              aprovar mesmo assim: o talento tera acesso ao painel e a cobranca PIX pendente sera cancelada.
+            </p>
+            <div className="talent-action-row">
+              <button type="button" className="button button--ghost" disabled={isPending} onClick={() => setPendingApproval(null)}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="button button--primary"
+                disabled={isPending}
+                onClick={() => reviewTalent(pendingApproval, "approved")}
+              >
+                {isPending ? "Processando..." : "Sim, aprovar sem pagamento"}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       <section className="panel-card">
         <div className="admin-section-heading">
@@ -156,6 +201,11 @@ export function AdminTalentsWorkspace() {
 
                   <div className="talent-card__meta">
                     <StatusBadge tone={toProfileTone(item.profile.status)}>{formatProfileStatus(item.profile.status)}</StatusBadge>
+                    {item.profile.registration_payment_status && item.profile.registration_payment_status !== "not_required" ? (
+                      <StatusBadge tone={toRegistrationPaymentTone(item.profile.registration_payment_status)}>
+                        {formatRegistrationPaymentStatus(item.profile.registration_payment_status)}
+                      </StatusBadge>
+                    ) : null}
                     <span>{formatLocation(item.profile.city_name, item.profile.state_sigla)}</span>
                     <span>{item.pendingRequest ? formatChangeRequestType(item.pendingRequest.request_type) : "Sem pendencia"}</span>
                     <span>{formatDateTime(item.profile.submitted_at)}</span>
@@ -175,7 +225,7 @@ export function AdminTalentsWorkspace() {
 
                       {item.pendingRequest ? (
                         <div className="talent-hero-card__actions">
-                          <button type="button" className="button button--primary" disabled={isPending} onClick={() => reviewTalent(item, "approved")}>
+                          <button type="button" className="button button--primary" disabled={isPending} onClick={() => requestApproval(item)}>
                             {isPending ? "Processando..." : "Aprovar talento"}
                           </button>
                         </div>
@@ -212,6 +262,14 @@ export function AdminTalentsWorkspace() {
                           <div>
                             <dt>Slug publico</dt>
                             <dd>{item.profile.public_slug}</dd>
+                          </div>
+                          <div>
+                            <dt>Status do pagamento</dt>
+                            <dd>
+                              <StatusBadge tone={toRegistrationPaymentTone(item.profile.registration_payment_status)}>
+                                {formatRegistrationPaymentStatus(item.profile.registration_payment_status)}
+                              </StatusBadge>
+                            </dd>
                           </div>
                         </dl>
                       </article>

@@ -1,5 +1,7 @@
 export type ProfileStatus = "draft" | "pending_review" | "approved" | "rejected" | "suspended";
 
+export type RegistrationPaymentStatus = "not_required" | "pending" | "paid";
+
 export type UserRole = "talent" | "admin";
 
 export type AdminTalentMedia = {
@@ -108,6 +110,7 @@ export type TalentProfileRecord = {
   state_sigla?: string | null;
   bio: string | null;
   status: ProfileStatus;
+  registration_payment_status?: RegistrationPaymentStatus;
   submitted_at: string | null;
   reviewed_at: string | null;
   rejection_reason: string | null;

@@ -14,6 +14,30 @@ export function formatProfileStatus(status?: string | null) {
   }
 }
 
+export function formatRegistrationPaymentStatus(status?: string | null) {
+  switch (status) {
+    case "pending":
+      return "Pagamento pendente";
+    case "paid":
+      return "Pagamento concluido";
+    case "not_required":
+    default:
+      return "Sem cobranca";
+  }
+}
+
+export function toRegistrationPaymentTone(status?: string | null) {
+  switch (status) {
+    case "pending":
+      return "pending" as const;
+    case "paid":
+      return "success" as const;
+    case "not_required":
+    default:
+      return "neutral" as const;
+  }
+}
+
 export function formatElectionStatus(status?: string | null) {
   switch (status) {
     case "scheduled":
