@@ -170,7 +170,7 @@ export default async function TalentDetailPage({ params }: { params: Promise<{ i
           </aside>
         </section>
 
-        <section className="section-shell section-shell--split">
+        <section className="section-shell">
           <article className="panel-card">
             <p className="eyebrow">Midias aplicadas</p>
             <h2>Arquivos vinculados ao perfil</h2>
@@ -180,16 +180,6 @@ export default async function TalentDetailPage({ params }: { params: Promise<{ i
               <MediaGroup title="Video de apresentacao" items={introVideos} />
               <MediaGroup title="Galeria" items={galleryImages} />
             </div>
-          </article>
-
-          <article className="panel-card">
-            <p className="eyebrow">Leitura do schema</p>
-            <h2>Campos observados nesta tela</h2>
-            <ul className="bullet-list">
-              <li>`talent_profiles.status`, `submitted_at`, `reviewed_at`, `reviewed_by` e `rejection_reason`.</li>
-              <li>`profile_change_requests` para identificar a pendencia e registrar a decisao admin.</li>
-              <li>`talent_profile_media` com suporte a `profile_photo`, `intro_video` e `gallery_image`.</li>
-            </ul>
           </article>
         </section>
       </section>

@@ -44,7 +44,7 @@ export function SignInForm() {
         }}
       >
         <Field label="Email">
-          <Input type="email" name="email" placeholder="admin@indecult.org.br" required />
+          <Input type="email" name="email" placeholder="Digite seu e-mail" required />
         </Field>
         <Field label="Senha">
           <Input type="password" name="password" placeholder="Digite sua senha" required minLength={6} />

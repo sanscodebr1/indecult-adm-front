@@ -12,16 +12,11 @@ export default function AccessDeniedPage() {
         <section className="auth-layout">
           <article className="panel-card auth-copy">
             <p className="eyebrow">Acesso restrito</p>
-            <h1>Seu usuario nao tem permissao de admin.</h1>
+            <h1>Voce nao tem permissao para acessar o painel administrativo.</h1>
             <p>
-              O painel administrativo verifica a tabela <strong>`public.admins`</strong>. Para entrar no `/dashboard`, seu usuario precisa estar
-              vinculado nela com <strong>`is_active = true`</strong>.
+              Esta area e exclusiva para administradores autorizados. Se voce acredita que deveria ter acesso, entre em contato com a equipe
+              responsavel pela plataforma.
             </p>
-            <ul className="bullet-list">
-              <li>Confirme se o usuario certo foi usado no login.</li>
-              <li>Verifique se existe um registro para esse `user_id` na tabela `admins`.</li>
-              <li>Depois disso, faca login novamente e tente acessar o painel.</li>
-            </ul>
             <div className="hero__actions">
               <Link href="/login" className="button button--primary">
                 Voltar para login
