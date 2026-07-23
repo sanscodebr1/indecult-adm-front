@@ -53,13 +53,23 @@ export default function NewElectionPage() {
             </label>
 
             <label className="field-block field-block--full">
-              <span>Imagem de capa (URL)</span>
-              <input type="url" name="coverUrl" placeholder="https://exemplo.com/capa-da-eleicao.jpg" className="admin-input" />
+              <span>Banner desktop (URL)</span>
+              <input type="url" name="coverUrl" placeholder="https://exemplo.com/banner-desktop.jpg" className="admin-input" />
             </label>
 
             <label className="field-block field-block--full">
-              <span>Upload da capa</span>
+              <span>Upload do banner desktop (recomendado: 1920 x 600 px)</span>
               <input type="file" name="coverFile" accept="image/*" className="admin-input" />
+            </label>
+
+            <label className="field-block field-block--full">
+              <span>Banner mobile (URL)</span>
+              <input type="url" name="coverMobileUrl" placeholder="https://exemplo.com/banner-mobile.jpg" className="admin-input" />
+            </label>
+
+            <label className="field-block field-block--full">
+              <span>Upload do banner mobile (recomendado: 1080 x 1350 px)</span>
+              <input type="file" name="coverMobileFile" accept="image/*" className="admin-input" />
             </label>
 
             <label className="field-block">

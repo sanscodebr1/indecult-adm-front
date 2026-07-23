@@ -77,6 +77,7 @@ type ElectionRow = {
   description: string | null;
   logo_url: string | null;
   cover_url: string | null;
+  cover_mobile_url: string | null;
   visibility: "public" | "private";
   status: "draft" | "scheduled" | "live" | "paused" | "finished" | "cancelled";
   starts_at: string;

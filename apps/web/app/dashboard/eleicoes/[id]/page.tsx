@@ -184,13 +184,28 @@ export default async function ElectionDetailPage({
                 </label>
 
                 <label className="field-block field-block--full">
-                  <span>Imagem de capa (URL)</span>
+                  <span>Banner desktop (URL) — tamanho: 1920 × 600 px</span>
                   <input type="url" name="coverUrl" defaultValue={detail.election.cover_url ?? ""} className="admin-input" />
                 </label>
 
                 <label className="field-block field-block--full">
-                  <span>Upload da capa</span>
+                  <span>Upload do banner desktop — tamanho: 1920 × 600 px</span>
                   <input type="file" name="coverFile" accept="image/*" className="admin-input" />
+                </label>
+
+                <label className="field-block field-block--full">
+                  <span>Banner mobile (URL) — tamanho: 1080 × 1350 px</span>
+                  <input
+                    type="url"
+                    name="coverMobileUrl"
+                    defaultValue={detail.election.cover_mobile_url ?? ""}
+                    className="admin-input"
+                  />
+                </label>
+
+                <label className="field-block field-block--full">
+                  <span>Upload do banner mobile — tamanho: 1080 × 1350 px</span>
+                  <input type="file" name="coverMobileFile" accept="image/*" className="admin-input" />
                 </label>
 
                 <label className="field-block">
@@ -256,14 +271,27 @@ export default async function ElectionDetailPage({
               <h2>Dados da campanha</h2>
               {detail.election.cover_url ? (
                 <div className="stack">
+                  <strong>Banner desktop</strong>
                   <img
                     src={detail.election.cover_url}
-                    alt={`Capa da eleicao ${detail.election.title}`}
+                    alt={`Banner desktop da eleicao ${detail.election.title}`}
                     style={{ width: "100%", maxHeight: "240px", borderRadius: "18px", objectFit: "cover" }}
                   />
                 </div>
               ) : (
-                <div className="inline-alert">Nenhuma imagem de capa configurada para esta eleicao.</div>
+                <div className="inline-alert">Nenhum banner desktop configurado para esta eleicao.</div>
+              )}
+              {detail.election.cover_mobile_url ? (
+                <div className="stack">
+                  <strong>Banner mobile</strong>
+                  <img
+                    src={detail.election.cover_mobile_url}
+                    alt={`Banner mobile da eleicao ${detail.election.title}`}
+                    style={{ width: "100%", maxHeight: "360px", borderRadius: "18px", objectFit: "cover" }}
+                  />
+                </div>
+              ) : (
+                <div className="inline-alert">Sem banner mobile; o banner desktop sera usado como alternativa.</div>
               )}
               {detail.election.logo_url ? (
                 <div className="stack">
@@ -286,8 +314,12 @@ export default async function ElectionDetailPage({
                   <dd>{detail.election.logo_url ?? "Nao informado"}</dd>
                 </div>
                 <div>
-                  <dt>Capa URL</dt>
+                  <dt>Banner desktop URL</dt>
                   <dd>{detail.election.cover_url ?? "Nao informado"}</dd>
+                </div>
+                <div>
+                  <dt>Banner mobile URL</dt>
+                  <dd>{detail.election.cover_mobile_url ?? "Nao informado (usa o desktop)"}</dd>
                 </div>
                 <div>
                   <dt>Periodo</dt>

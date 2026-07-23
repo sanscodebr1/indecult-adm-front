@@ -26,6 +26,7 @@ const electionFormSchema = z.object({
   description: z.string().trim().optional(),
   logoUrl: z.string().trim().optional(),
   coverUrl: z.string().trim().optional(),
+  coverMobileUrl: z.string().trim().optional(),
   visibility: z.enum(["public", "private"]),
   status: z.enum(["draft", "scheduled", "live", "paused", "finished", "cancelled"]),
   startsAt: z.string().min(1, "Informe a data de inicio."),
@@ -187,6 +188,7 @@ export async function createElectionAction(formData: FormData) {
     description: String(formData.get("description") ?? ""),
     logoUrl: String(formData.get("logoUrl") ?? ""),
     coverUrl: String(formData.get("coverUrl") ?? ""),
+    coverMobileUrl: String(formData.get("coverMobileUrl") ?? ""),
     visibility: String(formData.get("visibility") ?? "public"),
     status: String(formData.get("status") ?? "draft"),
     startsAt: String(formData.get("startsAt") ?? ""),
@@ -208,12 +210,16 @@ export async function createElectionAction(formData: FormData) {
   const assetScopeKey = crypto.randomUUID();
   const logoFile = getOptionalFormFile(formData, "logoFile");
   const coverFile = getOptionalFormFile(formData, "coverFile");
+  const coverMobileFile = getOptionalFormFile(formData, "coverMobileFile");
   const logoUrl = logoFile
     ? await uploadElectionAsset(serviceClient, logoFile, "logo", assetScopeKey)
     : toNullableString(parsed.data.logoUrl);
   const coverUrl = coverFile
     ? await uploadElectionAsset(serviceClient, coverFile, "cover", assetScopeKey)
     : toNullableString(parsed.data.coverUrl);
+  const coverMobileUrl = coverMobileFile
+    ? await uploadElectionAsset(serviceClient, coverMobileFile, "cover-mobile", assetScopeKey)
+    : toNullableString(parsed.data.coverMobileUrl);
 
   const { data: election, error } = await serviceClient
     .from("elections")
@@ -223,6 +229,7 @@ export async function createElectionAction(formData: FormData) {
       description: parsed.data.description || null,
       logo_url: logoUrl,
       cover_url: coverUrl,
+      cover_mobile_url: coverMobileUrl,
       visibility: parsed.data.visibility,
       status: parsed.data.status,
       starts_at: new Date(parsed.data.startsAt).toISOString(),
@@ -266,6 +273,7 @@ export async function updateElectionAction(formData: FormData) {
     description: String(formData.get("description") ?? ""),
     logoUrl: String(formData.get("logoUrl") ?? ""),
     coverUrl: String(formData.get("coverUrl") ?? ""),
+    coverMobileUrl: String(formData.get("coverMobileUrl") ?? ""),
     visibility: String(formData.get("visibility") ?? "public"),
     status: String(formData.get("status") ?? "draft"),
     startsAt: String(formData.get("startsAt") ?? ""),
@@ -283,9 +291,10 @@ export async function updateElectionAction(formData: FormData) {
   const serviceClient = createServiceRoleSupabaseClient();
   const logoFile = getOptionalFormFile(formData, "logoFile");
   const coverFile = getOptionalFormFile(formData, "coverFile");
+  const coverMobileFile = getOptionalFormFile(formData, "coverMobileFile");
   const { data: existingElection, error: existingElectionError } = await serviceClient
     .from("elections")
-    .select("id, published_at, logo_url, cover_url")
+    .select("id, published_at, logo_url, cover_url, cover_mobile_url")
     .eq("id", parsed.data.electionId)
     .maybeSingle();
 
@@ -309,6 +318,9 @@ export async function updateElectionAction(formData: FormData) {
   const coverUrl = coverFile
     ? await uploadElectionAsset(serviceClient, coverFile, "cover", parsed.data.electionId)
     : toNullableString(parsed.data.coverUrl) ?? existingElection.cover_url ?? null;
+  const coverMobileUrl = coverMobileFile
+    ? await uploadElectionAsset(serviceClient, coverMobileFile, "cover-mobile", parsed.data.electionId)
+    : toNullableString(parsed.data.coverMobileUrl) ?? existingElection.cover_mobile_url ?? null;
 
   const { error } = await serviceClient
     .from("elections")
@@ -318,6 +330,7 @@ export async function updateElectionAction(formData: FormData) {
       description: parsed.data.description || null,
       logo_url: logoUrl,
       cover_url: coverUrl,
+      cover_mobile_url: coverMobileUrl,
       visibility: parsed.data.visibility,
       status: parsed.data.status,
       starts_at: new Date(parsed.data.startsAt).toISOString(),
@@ -750,7 +763,7 @@ function toMediaSource(value: unknown) {
 async function uploadElectionAsset(
   serviceClient: ReturnType<typeof createServiceRoleSupabaseClient>,
   file: File,
-  kind: "logo" | "cover",
+  kind: "logo" | "cover" | "cover-mobile",
   scopeKey: string
 ) {
   if (!file.type.startsWith("image/")) {
